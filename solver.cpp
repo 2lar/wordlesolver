@@ -13,4 +13,6 @@ int main(){
         "SEARE | STARE | SLANT | TRACE | ROAST\n" <<
         "but of course, you are free to choose whatever you like !\n\n"; 
 
+    cout << run();
+    return 0;
 }
