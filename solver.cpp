@@ -1,5 +1,5 @@
 #include <iostream>
-#inclide <string>
+#include <string>
 #include <vector>
 #include <unordered_map>
 #include <map>
