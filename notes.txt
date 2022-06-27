@@ -1,13 +1,23 @@
-- Need to create structure for letters that are right and wrong
-- use the letters in the right place and wrong letters to find and suggest a word
-- meaning, based on previous guesses, it should find words that does not contain words in the wrong container
+HOW THIS SOLVER WORKS (PLANS TO BE):
 
-with the guesses, if green/yellow, obtain the word list for the letter from masterlist and insert into a list.
-then take that list and insert into the intersection function to find words that are shared between each of the lists
-    !!! SOMETHING TO MIND: forgot
-    oh. for the yellows, insert the lists that yellow characters could be in but not the position that was used in the guess.
-    so if yellow was in pos 5 and green alr has 124, or 12, give list of 3 and 23, respectively, to the insersection list.
+takes all greens and any word with a letter in that position will be added into a list as a vector.
+this will be done with any other greens
+    ++ NEED TO DO THE SAME FOR YELLOWS so that it becomes more accurate.
 
-then on the intersection list, give first word based on word.txt order, have the container self sort and give first, give the one
-    with the most common letters, give the one with the most vowels, or give based on random (could be given by user or self used on algo)
-    //probably should also remove the guessed word from vector if it is not correct. MAYBE. but most likely.
+once the list is created, find all common words and pick word from that and continue again.
+the suggested word is not random and comes from the first of the list.
+
+what needs to be done:
+- consider the yellows, though they may not be in the correct positions, it could be used to find words with the same 
+    letter but in different positions with other matchings, if there are any, into the intersctions list
+
+- also need to consider the greyed / invalid letters so that the search does not consider repeated letters that provide no use
+    to finding the right word.
+
+- what if the first word provides all greys ?
+
+++ for later updates:
+container for new letters found ?
+container to consider the frequency of each letter for every word in the word list.
+    this can be probably be used for something like finding the most common letter and using that to consider the next word suggestion
+    there are other things to do with frequency, as well

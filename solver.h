@@ -20,7 +20,10 @@ struct Word{
     Word(string x = "     "){
         if (x.size() != 5){
             // cerr << "Invalid word size: "+x+"\n"; //user defined literal operator to iterate through each char
-            throw runtime_error("Invalid word size: "+x+"\n");
+            throw runtime_error("==== Invalid word size: "+x+" ====\n");
+        }
+        for (char &c : x){
+            if (!isalpha(c)) throw runtime_error("==== Input needs to be all alphabetical ====");
         }
         word = x;
     }
@@ -72,12 +75,9 @@ void thelistmaker(){
 //takes in a list of vectors of idx and find intersection between all lists
 //CURRENT: only finds intersections between greens
 vector<int> intersections(const list<vector<int>> &ilist){
-    cout << "THIS IS IN INTERSECTIONS" << endl;
     unordered_map<int, int> checker; //element to counter
     vector<int> ireturn;
     const int isize = ilist.size();
-    
-    cout << "THIS IS ISIZE: " << isize << endl;
 
     for (const auto &sections : ilist)
         for (const auto &wordidx : sections) checker[wordidx] += 1;
@@ -92,12 +92,6 @@ void checkguess(Word &word, int attempts){
     //correctness legend:
     // 0 = black || 1 = yellow || 2 = green
 
-    // for (int i = 0; i < thelist.size(); i++){
-    //     if (thelist[i].word == word.word){
-    //         thelist.erase(thelist.begin() + i - attempts);
-    //     }
-    // }
-
     cout << "0: wrong | 1:wrong place | 2:correct: ";
     getline(cin >> ws, guessbool);
 
@@ -111,16 +105,9 @@ void checkguess(Word &word, int attempts){
             valid.push_back(word.word[i]);
 
             //remove pos i from initial and insert vector of words from char at pos i into intersector
-            cout << "pushing a list into tointersect: " << word.word[i] << endl;;
             tointersect.push_back(master[(word.word[i])][i]);
-            cout << "trying inital deletes" << endl;
-            for (int x : initial) cout << x << " ";
-            cout << endl;
             vector<int>::iterator initit = find(initial.begin(), initial.end(), i);
-            if (initit != initial.end()) initial.erase(initial.begin() + i - ideleted);
-            cout << "inital deletes end" << endl;
-            for (int x : initial) cout << x << " ";
-            cout << endl;
+            if (initit != initial.end()) initial.erase(initial.begin() + i - ideleted++);
 
             // delete from masterlist
             
@@ -128,14 +115,12 @@ void checkguess(Word &word, int attempts){
             word.word[i] = toupper(word.word[i]);
         }
         else if(guessbool[i] == '1'){
-            cout << "PUSHED BACK INTO VALID AND YELLOW: " << 1 << endl;
             valid.push_back(word.word[i]);
 
             yellow.push_back(word.word[i]);
             //find any pos still in inital but not i and insert into intersector(the vector of words for the intersection list)
         }
         else if (guessbool[i] == '0'){
-            cout << "PUSHED BACK INTO INVALID: " << 0 << endl;
             invalid.push_back(word.word[i]);
         }
         // else if ((guessbool[i]) > '2' || (guessbool[i]) < '0') throw runtime_error("Invalid character bool input");
@@ -143,12 +128,8 @@ void checkguess(Word &word, int attempts){
     }
     
     vector<int> resultant = intersections(tointersect);
-    // for (int x : resultant) cout << x << endl;
 
-    for (string x : deleted) cout << x << " ";
-    cout << endl;
-    // for (auto &g : resultant) cout << thelist[g].word << endl;
-    cout << resultant.size() << " THIS IS ONE SUGGESTION: ";
+    cout << "THIS IS ONE SUGGESTION: ";
     for (int r : resultant){
         bool brek = false;
         if (deleted.empty()) break;
@@ -206,5 +187,6 @@ string run(){
         cout << "YOUR ATTEMPTS: " << attempts << endl << endl;
     }//END while loop
 
+    if (attempts == 6) cout << "you lost, lol" << endl;
     return "IN WORKS: finished run";
 }//END run()
