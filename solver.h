@@ -60,14 +60,6 @@ void thelistmaker(){
         }counter++;
     }
 
-    cout << "THIS IS MASTER SIZE: " << master.size() << endl;
-    cout << "THIS IS 'A' SIZE: " << master['a'].size() << endl;
-    cout << "THIS IS HOW MANY WORDS HAVE A IN FIRST POSITION: " << master['a'][0].size() << endl;
-    cout << "THIS IS THE FIRST WORD WITH A IN THE BEGINNING: " << thelist[master['a'][0][0]].word << endl;
-    cout << "THIS IS VECTOR[4]: " << thelist[4].word << endl;
-    cout << "SHOULD BE ZORRO: " << thelist[12958].word << endl;
-    cout << "this is 34: " << thelist[33].word << endl;
-
     //these words are found online
     cout << "THESE ARE RECOMMENDED START WORDS:\n" <<
         "SOARE | ROATE | RAISE | CRANE | SLATE\n" <<
@@ -80,26 +72,19 @@ void thelistmaker(){
 //takes in a list of vectors of idx and find intersection between all lists
 //CURRENT: only finds intersections between greens
 vector<int> intersections(const list<vector<int>> &ilist){
+    cout << "THIS IS IN INTERSECTIONS" << endl;
     unordered_map<int, int> checker; //element to counter
     vector<int> ireturn;
     const int isize = ilist.size();
-
-    for (const auto &sections : ilist){
-        for (const auto &wordidx : sections){
-            checker[wordidx] += 1;
-        }
-    }
-
-    for (const auto &e : checker){
-        if (checker[e.first] == isize){
-            ireturn.push_back(e.first);
-        }
-    }
     
-    // cout << "THIS IS IRETURN: " << endl;
-    // for (auto &r : ireturn){
-    //     cout << thelist[r].word << endl;
-    // }
+    cout << "THIS IS ISIZE: " << isize << endl;
+
+    for (const auto &sections : ilist)
+        for (const auto &wordidx : sections) checker[wordidx] += 1;
+
+    for (const auto &e : checker)
+        if (checker[e.first] == isize) ireturn.push_back(e.first);
+
     return ireturn;
 }//END intersections()
 
@@ -117,7 +102,7 @@ void checkguess(Word &word, int attempts){
     getline(cin >> ws, guessbool);
 
     vector<char> yellow; yellow.reserve(5);
-    vector<int> initial =  {1,2,3,4,5}; int ideleted = 0;
+    vector<int> initial =  {0,1,2,3,4}; int ideleted = 0;
     list<vector<int>> tointersect;
 
 
@@ -126,9 +111,16 @@ void checkguess(Word &word, int attempts){
             valid.push_back(word.word[i]);
 
             //remove pos i from initial and insert vector of words from char at pos i into intersector
+            cout << "pushing a list into tointersect: " << word.word[i] << endl;;
             tointersect.push_back(master[(word.word[i])][i]);
+            cout << "trying inital deletes" << endl;
+            for (int x : initial) cout << x << " ";
+            cout << endl;
             vector<int>::iterator initit = find(initial.begin(), initial.end(), i);
             if (initit != initial.end()) initial.erase(initial.begin() + i - ideleted);
+            cout << "inital deletes end" << endl;
+            for (int x : initial) cout << x << " ";
+            cout << endl;
 
             // delete from masterlist
             
@@ -136,12 +128,14 @@ void checkguess(Word &word, int attempts){
             word.word[i] = toupper(word.word[i]);
         }
         else if(guessbool[i] == '1'){
+            cout << "PUSHED BACK INTO VALID AND YELLOW: " << 1 << endl;
             valid.push_back(word.word[i]);
 
             yellow.push_back(word.word[i]);
             //find any pos still in inital but not i and insert into intersector(the vector of words for the intersection list)
         }
         else if (guessbool[i] == '0'){
+            cout << "PUSHED BACK INTO INVALID: " << 0 << endl;
             invalid.push_back(word.word[i]);
         }
         // else if ((guessbool[i]) > '2' || (guessbool[i]) < '0') throw runtime_error("Invalid character bool input");

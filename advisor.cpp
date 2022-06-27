@@ -8,6 +8,5 @@ int main(){
     
     cout << run();
 
-    
     return 0;
 }
