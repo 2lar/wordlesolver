@@ -1,36 +1,6 @@
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <array>
-#include <fstream>
-#include <sstream>
-#include <map>
-#include <unordered_map>
-#include <list>
+#include "solver.hpp"
 
 using namespace std;
-
-struct Word{
-    //char array of size 6 because there is null terminated char at end
-    //we could use size 5 but it could cause some weird things
-    //will need to see whether we can use 5 or not
-    string word;
-
-    Word(string x = "     "){
-        if (x.size() != 5){
-            // cerr << "Invalid word size: "+x+"\n"; //user defined literal operator to iterate through each char
-            throw runtime_error("==== Invalid word size: "+x+" ====\n");
-        }
-        for (char &c : x){
-            if (!isalpha(c)) throw runtime_error("==== Input needs to be all alphabetical ====");
-        }
-        word = x;
-    }
-};//END word struct
-
-//THINGS TO KEEP TRACK TO GET SOLUTION
-const string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 map<char, map<int, vector<int>>> master;
 //this is mapped to every letter. for every letter, records index in which is shows up in word
@@ -44,8 +14,9 @@ string guessbool = "";
 
 
 //FUNCTIONS
+
 void thelistmaker(){
-    cout << "MAKING THE AND MASTER LIST..." << endl << endl;
+    cout << "MAKING THE- AND MASTER- LIST..." << endl << endl;
     //since there are a lot of words, should reserve the amount of space that we will use.
     thelist.reserve(12973);
     
@@ -89,9 +60,6 @@ vector<int> intersections(const list<vector<int>> &ilist){
 }//END intersections()
 
 void checkguess(Word &word, int attempts){
-    //correctness legend:
-    // 0 = black || 1 = yellow || 2 = green
-
     cout << "0: wrong | 1:wrong place | 2:correct: ";
     getline(cin >> ws, guessbool);
 
@@ -99,19 +67,17 @@ void checkguess(Word &word, int attempts){
     vector<int> initial =  {0,1,2,3,4}; int ideleted = 0;
     list<vector<int>> tointersect;
 
-
     for (int i = 0; i < 5; i++){
         if (guessbool[i] == '2'){
             valid.push_back(word.word[i]);
 
             //remove pos i from initial and insert vector of words from char at pos i into intersector
             tointersect.push_back(master[(word.word[i])][i]);
+
+            //delete green idx from initial
             vector<int>::iterator initit = find(initial.begin(), initial.end(), i);
             if (initit != initial.end()) initial.erase(initial.begin() + i - ideleted++);
 
-            // delete from masterlist
-            
-            //
             word.word[i] = toupper(word.word[i]);
         }
         else if(guessbool[i] == '1'){
@@ -119,27 +85,18 @@ void checkguess(Word &word, int attempts){
 
             yellow.push_back(word.word[i]);
             //find any pos still in inital but not i and insert into intersector(the vector of words for the intersection list)
+            //NEED TO DO: INSERT INTO INTERSECTOR LIST
         }
         else if (guessbool[i] == '0'){
             invalid.push_back(word.word[i]);
         }
         // else if ((guessbool[i]) > '2' || (guessbool[i]) < '0') throw runtime_error("Invalid character bool input");
-        else throw runtime_error("Invalid character bool input");
+        else throw runtime_error("==== Invalid character bool input ====");
     }
     
+    //post finding intersections
     vector<int> resultant = intersections(tointersect);
-
-    cout << "THIS IS ONE SUGGESTION: ";
-    for (int r : resultant){
-        bool brek = false;
-        if (deleted.empty()) break;
-        vector<string>::iterator w = find(deleted.begin(), deleted.end(), thelist[r].word);
-        if (w != deleted.end()){
-            continue;
-        }
-        cout << thelist[r].word;
-        break;
-    }cout << endl;
+    suggest(resultant, deleted, thelist);
 
     //THIS PART DOES NOT NEED TO BE INCLUDED. ONLY FOR VISUALIZATION
     if (!yellow.empty()){
@@ -149,44 +106,33 @@ void checkguess(Word &word, int attempts){
     }
 }//END checkguess
 
-
 string run(){
     uint32_t attempts = 0;
     while (attempts != 6 && guessbool != "22222"){
         string in;
         cout << "YOUR GUESS ('q' to quit): ";
         getline(cin >> ws, in);
+
         if (in == "q") break;
 
         try{
             Word guess(in);
-            
             deleted.push_back(in);
 
             //NEED CHECK WORD TO ANSWER // CHECK CORRECTNESS - use helper function
             checkguess(guess, attempts);
-
             guesses.push_back(guess);
 
-            //turn this into function later will write in here for now
-                //edit wrote it in the checkguess func;
             attempts++;
-
         }catch (runtime_error &e){
             cerr << e.what() << endl;
         }
 
-        cout << "YOUR GUESSES:\n------------\n";
-        for (Word &w : guesses){
-            for (char &c : w.word){
-                cout << c << ' ';
-            }cout << endl;
-        }cout << endl;
-
+        showguesses(guesses);
 
         cout << "YOUR ATTEMPTS: " << attempts << endl << endl;
     }//END while loop
 
-    if (attempts == 6) cout << "you lost, lol" << endl;
+    if (attempts == 7) return "you lost, lol";
     return "IN WORKS: finished run";
 }//END run()
