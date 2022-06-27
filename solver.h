@@ -68,8 +68,6 @@ void thelistmaker(){
     cout << "SHOULD BE ZORRO: " << thelist[12958].word << endl;
     cout << "this is 34: " << thelist[33].word << endl;
 
-
-
     //these words are found online
     cout << "THESE ARE RECOMMENDED START WORDS:\n" <<
         "SOARE | ROATE | RAISE | CRANE | SLATE\n" <<
@@ -79,6 +77,8 @@ void thelistmaker(){
 
 }//END thelistmaker()
 
+//takes in a list of vectors of idx and find intersection between all lists
+//CURRENT: only finds intersections between greens
 vector<int> intersections(const list<vector<int>> &ilist){
     unordered_map<int, int> checker; //element to counter
     vector<int> ireturn;
@@ -91,22 +91,27 @@ vector<int> intersections(const list<vector<int>> &ilist){
     }
 
     for (const auto &e : checker){
-        if (checker[e.first] == isize) ireturn.push_back(e.first);
+        if (checker[e.first] == isize){
+            ireturn.push_back(e.first);
+        }
     }
-
+    
+    // cout << "THIS IS IRETURN: " << endl;
+    // for (auto &r : ireturn){
+    //     cout << thelist[r].word << endl;
+    // }
     return ireturn;
 }//END intersections()
 
 void checkguess(Word &word, int attempts){
     //correctness legend:
-    // 0 = black
-    // 1 = yellow
-    // 2 = green
-    for (int i = 0; i < thelist.size(); i++){
-        if (thelist[i].word == word.word){
-            thelist.erase(thelist.begin() + i - attempts);
-        }
-    }
+    // 0 = black || 1 = yellow || 2 = green
+
+    // for (int i = 0; i < thelist.size(); i++){
+    //     if (thelist[i].word == word.word){
+    //         thelist.erase(thelist.begin() + i - attempts);
+    //     }
+    // }
 
     cout << "0: wrong | 1:wrong place | 2:correct: ";
     getline(cin >> ws, guessbool);
@@ -117,7 +122,6 @@ void checkguess(Word &word, int attempts){
 
 
     for (int i = 0; i < 5; i++){
-        vector<int> combiner, sfinal;
         if (guessbool[i] == '2'){
             valid.push_back(word.word[i]);
 
@@ -128,9 +132,7 @@ void checkguess(Word &word, int attempts){
 
             // delete from masterlist
             
-            
             //
-
             word.word[i] = toupper(word.word[i]);
         }
         else if(guessbool[i] == '1'){
@@ -147,10 +149,11 @@ void checkguess(Word &word, int attempts){
     }
     
     vector<int> resultant = intersections(tointersect);
+    // for (int x : resultant) cout << x << endl;
 
     for (string x : deleted) cout << x << " ";
     cout << endl;
-    for (auto &g : resultant) cout << thelist[g].word << endl;
+    // for (auto &g : resultant) cout << thelist[g].word << endl;
     cout << resultant.size() << " THIS IS ONE SUGGESTION: ";
     for (int r : resultant){
         bool brek = false;
@@ -162,8 +165,6 @@ void checkguess(Word &word, int attempts){
         cout << thelist[r].word;
         break;
     }cout << endl;
-
-
 
     //THIS PART DOES NOT NEED TO BE INCLUDED. ONLY FOR VISUALIZATION
     if (!yellow.empty()){
@@ -189,7 +190,6 @@ string run(){
 
             //NEED CHECK WORD TO ANSWER // CHECK CORRECTNESS - use helper function
             checkguess(guess, attempts);
-
 
             guesses.push_back(guess);
 
