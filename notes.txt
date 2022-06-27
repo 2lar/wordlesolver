@@ -1,0 +1,13 @@
+- Need to create structure for letters that are right and wrong
+- use the letters in the right place and wrong letters to find and suggest a word
+- meaning, based on previous guesses, it should find words that does not contain words in the wrong container
+
+with the guesses, if green/yellow, obtain the word list for the letter from masterlist and insert into a list.
+then take that list and insert into the intersection function to find words that are shared between each of the lists
+    !!! SOMETHING TO MIND: forgot
+    oh. for the yellows, insert the lists that yellow characters could be in but not the position that was used in the guess.
+    so if yellow was in pos 5 and green alr has 124, or 12, give list of 3 and 23, respectively, to the insersection list.
+
+then on the intersection list, give first word based on word.txt order, have the container self sort and give first, give the one
+    with the most common letters, give the one with the most vowels, or give based on random (could be given by user or self used on algo)
+    //probably should also remove the guessed word from vector if it is not correct. MAYBE. but most likely.
