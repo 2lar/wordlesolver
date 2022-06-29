@@ -35,6 +35,7 @@ void suggest(vector<int> &resultant, vector<string> &deleted, vector<Word> &thel
     for (int r : resultant){
         bool brek = false;
         if (deleted.empty()) break;
+        //iterates over the deleted ones so that they don't print as a suggestion
         vector<string>::iterator w = find(deleted.begin(), deleted.end(), thelist[r].word);
         if (w != deleted.end()){
             continue;

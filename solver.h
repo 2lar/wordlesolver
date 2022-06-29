@@ -44,35 +44,51 @@ void thelistmaker(){
 }//END thelistmaker()
 
 //takes in a list of vectors of idx and find intersection between all lists
-//CURRENT: only finds intersections between greens
+//CURRENT: yellows are probably considered now, need to consider the greys
 vector<int> intersections(const list<vector<int>> &ilist){
-    unordered_map<int, int> checker; //element to counter
-    vector<int> ireturn;
+    unordered_map<int, int> checker; //element(wordidx) to counter
+    vector<int> ireturn, first, second;
     const int isize = ilist.size();
 
-    for (const auto &sections : ilist)
-        for (const auto &wordidx : sections) checker[wordidx] += 1;
+    //sections are the different list of words that have character at a certain position.
+    for (auto &sections : ilist){
+            for (const auto &wordidx : sections) checker[wordidx] += 1;
+    }
 
-    for (const auto &e : checker)
+    //what can be done is to use the set difference stl function. have to do it in a way where the list is created temp in loop
+    //then updates the main by using set difference again. so double set difference per char.
+    for (const auto &e : checker) 
         if (checker[e.first] == isize) ireturn.push_back(e.first);
 
     return ireturn;
 }//END intersections()
 
+void onlyvalids(vector<int> &resultant){
+    for (int &idx : resultant){
+        for (char &c : thelist[idx].word){
+            vector<char>::iterator invr = find(invalid.begin(), invalid.end(), c);
+            if (invr != invalid.end()){
+                resultant.erase(remove(resultant.begin(), resultant.end(), idx), resultant.end());
+            }
+        }
+    }
+}//END onlyvalids
+
 void checkguess(Word &word, int attempts){
     cout << "0: wrong | 1:wrong place | 2:correct: ";
     getline(cin >> ws, guessbool);
 
-    vector<char> yellow; yellow.reserve(5);
+    vector<pair<char, int>> yellow; yellow.reserve(5);
     vector<int> initial =  {0,1,2,3,4}; int ideleted = 0;
-    list<vector<int>> tointersect;
+    list<vector<int>> tointersect, toinvalid;
+    //toinvalid vould be the invalid list replacement
 
     for (int i = 0; i < 5; i++){
         if (guessbool[i] == '2'){
             valid.push_back(word.word[i]);
 
             //remove pos i from initial and insert vector of words from char at pos i into intersector
-            tointersect.push_back(master[(word.word[i])][i]);
+            tointersect.push_back(master[word.word[i]][i]);
 
             //delete green idx from initial
             vector<int>::iterator initit = find(initial.begin(), initial.end(), i);
@@ -83,25 +99,34 @@ void checkguess(Word &word, int attempts){
         else if(guessbool[i] == '1'){
             valid.push_back(word.word[i]);
 
-            yellow.push_back(word.word[i]);
-            //find any pos still in inital but not i and insert into intersector(the vector of words for the intersection list)
-            //NEED TO DO: INSERT INTO INTERSECTOR LIST
+            yellow.emplace_back(word.word[i], i);
         }
         else if (guessbool[i] == '0'){
+            toinvalid.push_back(master[word.word[i]][i]);
             invalid.push_back(word.word[i]);
         }
         // else if ((guessbool[i]) > '2' || (guessbool[i]) < '0') throw runtime_error("Invalid character bool input");
         else throw runtime_error("==== Invalid character bool input ====");
     }
+
+    //this is yellow checking, after the for loop because yellow cna show before greens or greys
+    for (pair<char, int> &y : yellow){
+        for (int &d : initial){
+            if (y.second != d) tointersect.push_back(master[(word.word[y.first])][y.first]);
+        }
+    }
     
     //post finding intersections
-    vector<int> resultant = intersections(tointersect);
+    vector<int> resultant = intersections(tointersect); //considers greens and yellows
+
+    onlyvalids(resultant);
+
     suggest(resultant, deleted, thelist);
 
     //THIS PART DOES NOT NEED TO BE INCLUDED. ONLY FOR VISUALIZATION
     if (!yellow.empty()){
         cout << "THESE LETTERS ARE IN WRONG PLACE (inorder): ";
-        for (char &c : yellow) cout << c << ' ';
+        for (auto &c : yellow) cout << c.first << ' ';
         cout << endl;
     }
 }//END checkguess
