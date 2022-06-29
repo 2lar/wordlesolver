@@ -21,3 +21,7 @@ container for new letters found ?
 container to consider the frequency of each letter for every word in the word list.
     this can be probably be used for something like finding the most common letter and using that to consider the next word suggestion
     there are other things to do with frequency, as well
+    
+    
+since we know that wordle uses 5 letter words, we should also use the frequency of each letter to develop scores. this is because letters that appear more often in certain positions means that there are more chances that that letter will appear in a word, thus to increase any chances of getting the right word, we have to suggest/obtain the letters that are most likely to appear as the answer. -> this wording is a bit weird but tht should get the message thru
+// basically, higher frequency of a letter means that it is more likley to show up in the final answer, thus we need to keep track of letter frquncy in each position.
