@@ -9,6 +9,13 @@
         "list": "cpp",
         "array": "cpp",
         "map": "cpp",
-        "xmemory": "cpp"
+        "xmemory": "cpp",
+        "unordered_set": "cpp",
+        "initializer_list": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp",
+        "utility": "cpp",
+        "algorithm": "cpp"
     }
 }
