@@ -40,6 +40,17 @@ struct Word{
 
 //beautify with these functions;
 void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word> &thelist){
+    cout << "THIS IS IN SUGGEST FUNCTION" << endl;
+    cout << "THIS IS RESULTANT" << endl;
+    for (auto &i : resultant){
+        cout << thelist[i].word << ' ';
+    }cout << endl;
+
+    cout << "IN DELETED" << endl;
+    for (string &s : deleted){
+        cout << s << endl;
+    }cout << endl;
+
     cout << "THIS IS ONE SUGGESTION: ";
 
     for (int r : resultant){
@@ -48,10 +59,14 @@ void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word
         //iterates over the deleted ones so that they don't print as a suggestion
         vector<string>::iterator w = find(deleted.begin(), deleted.end(), thelist[r].word);
         if (w != deleted.end()){
-            continue;
+            cout << "DELETED: " << *w << endl;
+            resultant.erase(r);
         }
-        cout << thelist[r].word;
-        break;
+    }
+
+    cout << "THIS IS ALL IN RESULTANT" << endl;
+    for (int r : resultant){
+        cout << thelist[r].word << ' ';
     }cout << endl;
 }
 
