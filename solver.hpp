@@ -6,11 +6,20 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <unordered_map>
+
 #include <unordered_set>
 #include <list>
 
 using namespace std;
+
+void firstsuggestions(){
+    //these words are found online
+    cout << "THESE ARE RECOMMENDED START WORDS:\n" <<
+        "SOARE | ROATE | RAISE | CRANE | SLATE\n" <<
+        "SEARE | STARE | SLANT | TRACE | ROAST\n" <<
+        "ADIEU | SNARE | RAISE | AESIR | MONKEYU (jk)\n" <<
+        "but of course, you are free to choose whatever you like !\n\n"; 
+}//END first suggestions
 
 struct Word{
     string word;
@@ -30,7 +39,7 @@ struct Word{
 
 
 //beautify with these functions;
-void suggest(vector<int> &resultant, vector<string> &deleted, vector<Word> &thelist){
+void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word> &thelist){
     cout << "THIS IS ONE SUGGESTION: ";
 
     for (int r : resultant){
