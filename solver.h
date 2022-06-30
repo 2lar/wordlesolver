@@ -83,37 +83,38 @@ unordered_set<int> intersections(const list<unordered_set<int>> &ilist){
 
 void onlyvalids(unordered_set<int> &thefinal, unordered_set<int> &invalidlist){
     if (invalidlist.size() == 0){
-        cout << "returning from onlyvalids" << endl;
+        // cout << "returning from onlyvalids" << endl;
         return;
     }
     for (auto &key : thefinal){
         unordered_set<int>::iterator ovc = invalidlist.find(key);
         if (ovc != invalidlist.end()){
-            cout << "this is ovc: " << thelist[*ovc].word << endl;
+            // cout << "this is ovc: " << thelist[*ovc].word << endl;
             thefinal.erase(key);
         }
 
-        cout << "THIS IS INVALID CHAR LIST: ";
-        for (auto &c : invalidchar){
-            cout << c << " ";
-        }cout << endl;
+        // cout << "THIS IS INVALID CHAR LIST: ";
+        // for (auto &c : invalidchar){
+        //     cout << c << " ";
+        // }cout << endl;
 
-        cout << "THIS IS THE WORD: " << thelist[key].word << endl;
-        cout << "THIS IS THE char in the string: ";
+        // cout << "THIS IS THE WORD: " << thelist[key].word << endl;
+        // cout << "THIS IS THE char in the string: ";
         for (auto &s : thelist[key].word){
-            cout << s << " ";
+            // cout << s << " ";
             unordered_set<char>::iterator invc = invalidchar.find(s);
             if (invc != invalidchar.end()){
-                cout << "DELETING BECAUSE IT FOUND INVALID CHAR" << endl;
+                // cout << "DELETING BECAUSE IT FOUND INVALID CHAR" << endl;
                 thefinal.erase(key);
             }
-        }cout << endl;
+        }
+        // cout << endl;
     }
 
-    cout << "THEFINAL BEFORE SUGGEST IN ONLYVALID" << endl;
-    for (auto &w : thefinal){
-        cout << thelist[w].word << endl;
-    }cout << endl;
+    // cout << "THEFINAL BEFORE SUGGEST IN ONLYVALID" << endl;
+    // for (auto &w : thefinal){
+    //     cout << thelist[w].word << endl;
+    // }cout << endl;
 }//END onlyvalids
 
 void checkguess(Word &word, int attempts){
@@ -125,15 +126,15 @@ void checkguess(Word &word, int attempts){
     list<unordered_set<int>> tointersect;
     
 
-    cout << "THIS IS VALID SIZE: ";
-    cout << valid.size() << endl;
+    // cout << "THIS IS VALID SIZE: ";
+    // cout << valid.size() << endl;
 
     for (int i = 0; i < 5; i++){
         if (guessbool[i] == '2'){
             valid[i] = word.word[i];
             validchar.insert(word.word[i]);
-            cout << "UPDATED VALID SIZE: ";
-            cout << valid.size() << endl;
+            // cout << "UPDATED VALID SIZE: ";
+            // cout << valid.size() << endl;
             //remove pos i from initial and insert vector of words from char at pos i into intersector
             // for (auto &u : master[word.word[i]][i]){
             //     cout << thelist[u].word << endl;
@@ -155,11 +156,11 @@ void checkguess(Word &word, int attempts){
         else if (guessbool[i] == '0'){
             //adding EACH word into the invalid list
             for (auto &u : master[word.word[i]][i]){
-                cout << "INSERT INTO INVALIDLIST: " << thelist[u].word << endl;
+                // cout << "INSERT INTO INVALIDLIST: " << thelist[u].word << endl;
                 invalidlist.insert(u);
             }
             if (validchar.find(word.word[i]) != validchar.end() || attempts == 0){
-                cout << "INSERT INTO INVALIDCHAR: " << word.word[i] << endl;
+                // cout << "INSERT INTO INVALIDCHAR: " << word.word[i] << endl;
                 invalidchar.insert(word.word[i]);
             }
         }
@@ -167,8 +168,8 @@ void checkguess(Word &word, int attempts){
         else throw runtime_error("==== Invalid character bool input ====");
     }//end for loop
 
-    cout << "THIS IS VALID SIZE:";
-    cout << valid.size() << endl;
+    // cout << "THIS IS VALID SIZE:";
+    // cout << valid.size() << endl;
 
     //ADD INTO FREQUENCY
     for (auto &c : word.word){
@@ -203,25 +204,25 @@ void checkguess(Word &word, int attempts){
     if (initial.size() < 5){
         resultant = intersections(tointersect);
 
-        cout << "SEEING: ";
-        for (auto &p : resultant){
-            cout << thelist[p].word << ' ';
-        }cout << endl;
+        // cout << "SEEING: ";
+        // for (auto &p : resultant){
+        //     cout << thelist[p].word << ' ';
+        // }cout << endl;
 
         
         if (yellowset.size() != 0){
-            cout << "YELLOWSET SIZE is not 0: " << yellowset.size() << endl;
+            // cout << "YELLOWSET SIZE is not 0: " << yellowset.size() << endl;
             thefinal = intersections({resultant, yellowset});
-            cout << "THIS IS FINAL INTERSECTIONS: ";
-            for (auto &f : thefinal){
-                cout << thelist[f].word << ' ';
-            }cout << endl;
+            // cout << "THIS IS FINAL INTERSECTIONS: ";
+            // for (auto &f : thefinal){
+            //     cout << thelist[f].word << ' ';
+            // }cout << endl;
             onlyvalids(thefinal, invalidlist);
             suggest(thefinal, deleted, thelist);
         }
 
         else { //yellowset size is 0
-            cout << "yellowset is 0" << endl;
+            // cout << "yellowset is 0" << endl;
             onlyvalids(resultant, invalidlist);
             suggest(resultant, deleted, thelist);
         }
@@ -239,7 +240,7 @@ void checkguess(Word &word, int attempts){
 }//END checkguess
 
 string run(){
-    test();
+    // test();
 
     uint32_t attempts = 0;
     while (attempts != 6 && guessbool != "22222"){
