@@ -1,77 +1,125 @@
 #include "solver.hpp"
 
+
 using namespace std;
 
-map<char, map<int, vector<int>>> master;
-//this is mapped to every letter. for every letter, records index in which is shows up in word
-//and records word in index form within thelist
+unordered_map<char, unordered_map<int, unordered_set<int>>> master;
 
 vector<Word> thelist, guesses;
-vector<char> valid, invalid;
-vector<string> deleted;
+vector<int> initial =  {0,1,2,3,4}; int ideleted = 0;
 
+unordered_map<char, int> partialinvalid; //pair between the char and pos that is invalid;
+unordered_map<char, int> totinvalid, frequencies;
+unordered_set<int> resultant, invalidlist, yellowed, thefinal;
+unordered_map<int, char> valid;
+unordered_set<char> invalidchar, validchar;
+
+map<char, vector<int>> freqatpos;
+
+vector<string> deleted;
 string guessbool = "";
 
-
-//FUNCTIONS
+void test(){
+    cout << thelist[0].word << endl;
+}
 
 void thelistmaker(){
-    cout << "MAKING THE- AND MASTER- LIST..." << endl << endl;
-    //since there are a lot of words, should reserve the amount of space that we will use.
+    cout << "Making the THE and MASTER LIST..." << endl << endl;
+
+    //this is to make the frequency list
+    string alphabet = "abcdefghijklmnopqrstuvwxyz";
+    for (char &c : alphabet){
+        vector<int> freq(5);
+        freqatpos[c] = freq;
+        frequencies[c] = 0;
+    }//END for loop
+
+
     thelist.reserve(12973);
-    
-    //create an input file and read in contents
+
     ifstream thewords;
     thewords.open("words.txt");
 
-    //add contents to thelist
     string tempword;
     uint32_t counter = 0;
     while (getline(thewords, tempword)){
         thelist.emplace_back(tempword);
         for (int i = 0; i < 5; i++){
-            master[tempword[i]][i].push_back(counter);
+            //insert the wordidx into the master
+            master[tempword[i]][i].insert(counter);
+
+            freqatpos[tempword[i]][i]++;
+            frequencies[tempword[i]]++;
         }counter++;
     }
+    firstsuggestions();
 
-    //these words are found online
-    cout << "THESE ARE RECOMMENDED START WORDS:\n" <<
-        "SOARE | ROATE | RAISE | CRANE | SLATE\n" <<
-        "SEARE | STARE | SLANT | TRACE | ROAST\n" <<
-        "ADIEU | SNARE | RAISE | AESIR | MONKEYU (jk)\n" <<
-        "but of course, you are free to choose whatever you like !\n\n"; 
+    // for (auto &c : alphabet){
+    //     cout << c << ": " << frequencies[c] << endl;
+    // }
+}//END listmaker
 
-}//END thelistmaker()
+unordered_set<int> intersections(const list<unordered_set<int>> &ilist){
+    unordered_map<int, int> checker;
+    unordered_set<int> ireturn;
+    const int isize = valid.size();
+    // for (auto &v : valid){
+    //     cout << v.first << ' ';
+    // }cout << endl;
 
-//takes in a list of vectors of idx and find intersection between all lists
-//CURRENT: yellows are probably considered now, need to consider the greys
-vector<int> intersections(const list<vector<int>> &ilist){
-    unordered_map<int, int> checker; //element(wordidx) to counter
-    vector<int> ireturn, first, second;
-    const int isize = ilist.size();
-
-    //sections are the different list of words that have character at a certain position.
-    for (auto &sections : ilist){
-            for (const auto &wordidx : sections) checker[wordidx] += 1;
+    for (const auto &sections : ilist){
+        for (const auto &wordidx : sections){
+            checker[wordidx] += 1;
+            // cout << thelist[wordidx].word << endl;
+        }
     }
 
-    //what can be done is to use the set difference stl function. have to do it in a way where the list is created temp in loop
-    //then updates the main by using set difference again. so double set difference per char.
-    for (const auto &e : checker) 
-        if (checker[e.first] == isize) ireturn.push_back(e.first);
+    for (const auto &e : checker){
+        if (checker[e.first] == isize) ireturn.insert(e.first);
+    }
+
+    // cout << "THIS IS IRETURN" << endl;
+    // for (auto &i : ireturn){
+    //     cout << thelist[i].word << endl;
+    // }
 
     return ireturn;
 }//END intersections()
 
-void onlyvalids(vector<int> &resultant){
-    for (int &idx : resultant){
-        for (char &c : thelist[idx].word){
-            vector<char>::iterator invr = find(invalid.begin(), invalid.end(), c);
-            if (invr != invalid.end()){
-                resultant.erase(remove(resultant.begin(), resultant.end(), idx), resultant.end());
+void onlyvalids(unordered_set<int> &thefinal, unordered_set<int> &invalidlist){
+    if (invalidlist.size() == 0){
+        // cout << "returning from onlyvalids" << endl;
+        return;
+    }
+    for (auto &key : thefinal){
+        unordered_set<int>::iterator ovc = invalidlist.find(key);
+        if (ovc != invalidlist.end()){
+            // cout << "this is ovc: " << thelist[*ovc].word << endl;
+            thefinal.erase(key);
+        }
+
+        // cout << "THIS IS INVALID CHAR LIST: ";
+        // for (auto &c : invalidchar){
+        //     cout << c << " ";
+        // }cout << endl;
+
+        // cout << "THIS IS THE WORD: " << thelist[key].word << endl;
+        // cout << "THIS IS THE char in the string: ";
+        for (auto &s : thelist[key].word){
+            // cout << s << " ";
+            unordered_set<char>::iterator invc = invalidchar.find(s);
+            if (invc != invalidchar.end()){
+                // cout << "DELETING BECAUSE IT FOUND INVALID CHAR" << endl;
+                thefinal.erase(key);
             }
         }
+        // cout << endl;
     }
+
+    // cout << "THEFINAL BEFORE SUGGEST IN ONLYVALID" << endl;
+    // for (auto &w : thefinal){
+    //     cout << thelist[w].word << endl;
+    // }cout << endl;
 }//END onlyvalids
 
 void checkguess(Word &word, int attempts){
@@ -79,16 +127,25 @@ void checkguess(Word &word, int attempts){
     getline(cin >> ws, guessbool);
 
     vector<pair<char, int>> yellow; yellow.reserve(5);
-    vector<int> initial =  {0,1,2,3,4}; int ideleted = 0;
-    list<vector<int>> tointersect, toinvalid;
-    //toinvalid vould be the invalid list replacement
+    unordered_set<int> yellowset;
+    list<unordered_set<int>> tointersect;
+    
+
+    // cout << "THIS IS VALID SIZE: ";
+    // cout << valid.size() << endl;
 
     for (int i = 0; i < 5; i++){
         if (guessbool[i] == '2'){
-            valid.push_back(word.word[i]);
-
+            valid[i] = word.word[i];
+            validchar.insert(word.word[i]);
+            // cout << "UPDATED VALID SIZE: ";
+            // cout << valid.size() << endl;
             //remove pos i from initial and insert vector of words from char at pos i into intersector
+            // for (auto &u : master[word.word[i]][i]){
+            //     cout << thelist[u].word << endl;
+            // }
             tointersect.push_back(master[word.word[i]][i]);
+            
 
             //delete green idx from initial
             vector<int>::iterator initit = find(initial.begin(), initial.end(), i);
@@ -96,48 +153,109 @@ void checkguess(Word &word, int attempts){
 
             word.word[i] = toupper(word.word[i]);
         }
-        else if(guessbool[i] == '1'){
-            valid.push_back(word.word[i]);
 
+        else if (guessbool[i] == '1'){
             yellow.emplace_back(word.word[i], i);
         }
+
         else if (guessbool[i] == '0'){
-            toinvalid.push_back(master[word.word[i]][i]);
-            invalid.push_back(word.word[i]);
+            //adding EACH word into the invalid list
+            for (auto &u : master[word.word[i]][i]){
+                // cout << "INSERT INTO INVALIDLIST: " << thelist[u].word << endl;
+                invalidlist.insert(u);
+            }
+            if (validchar.find(word.word[i]) == validchar.end()){
+                // cout << "INSERT INTO INVALIDCHAR: " << word.word[i] << endl;
+                if (word.word.substr(i+1).find(word.word[i]) == string::npos){
+                    // cout << "adding into invalid char" << endl;
+                    invalidchar.insert(word.word[i]);
+                }
+            }
         }
-        // else if ((guessbool[i]) > '2' || (guessbool[i]) < '0') throw runtime_error("Invalid character bool input");
+
         else throw runtime_error("==== Invalid character bool input ====");
+    }//end for loop
+
+    // cout << "THIS IS VALID SIZE:";
+    // cout << valid.size() << endl;
+
+    //ADD INTO FREQUENCY
+    for (auto &c : word.word){
+         frequencies[c]++;
     }
 
-    //this is yellow checking, after the for loop because yellow cna show before greens or greys
+    //this is yellowchecking
     for (pair<char, int> &y : yellow){
         for (int &d : initial){
-            if (y.second != d) tointersect.push_back(master[(word.word[y.first])][y.first]);
+            if (y.second != d){
+                for (auto &yel : master[word.word[y.second]][d]){
+                    yellowset.insert(yel);
+                }
+            }
         }
-    }
-    
+    }//END for loop
+
+    // cout << "THIS IS TO INTERESECT" << endl;
+    // for (auto &c : tointersect){
+    //     for (auto &k : c){
+    //         cout << thelist[k].word << endl;
+    //     }
+    // }cout << endl;
+
+    // cout << "THIS IS YELLOWSET" << endl;
+    // for (auto k : yellowset){
+    //     cout << thelist[k].word << endl;
+    // }cout << endl;
+
     //post finding intersections
-    vector<int> resultant = intersections(tointersect); //considers greens and yellows
+    // cout << "THIS IS RESULTANT" << endl;
+    if (initial.size() < 5){
+        resultant = intersections(tointersect);
 
-    onlyvalids(resultant);
+        // cout << "SEEING: ";
+        // for (auto &p : resultant){
+        //     cout << thelist[p].word << ' ';
+        // }cout << endl;
 
-    suggest(resultant, deleted, thelist);
+        
+        if (yellowset.size() != 0){
+            // cout << "YELLOWSET SIZE is not 0: " << yellowset.size() << endl;
+            thefinal = intersections({resultant, yellowset});
+            resultant = thefinal;
+        }
 
-    //THIS PART DOES NOT NEED TO BE INCLUDED. ONLY FOR VISUALIZATION
-    if (!yellow.empty()){
-        cout << "THESE LETTERS ARE IN WRONG PLACE (inorder): ";
-        for (auto &c : yellow) cout << c.first << ' ';
-        cout << endl;
+
+        
+        onlyvalids(resultant, invalidlist);
+        suggest(resultant, deleted, thelist, frequencies);
+
+
+
+        // for (auto &s : scores){
+        //     cout << s.first << ": " << s.second << endl;
+        // }
+
+        
+
+        //need to make the suggestion based on strongest frequency score.
+        
     }
+    else{
+        //use the frequenct list to compute the next best suggestion based on 5 invalids.
+        cout << "you got nothing remotely close in the first try" << endl;
+    }
+    // cout << "end of checkguess" << endl;
 }//END checkguess
 
-string run(){
+void run(){
+    // test();
+
     uint32_t attempts = 0;
     while (attempts != 6 && guessbool != "22222"){
         string in;
         cout << "YOUR GUESS ('q' to quit): ";
-        getline(cin >> ws, in);
-
+        getline(cin >> ws, in); 
+        
         if (in == "q") break;
 
         try{
@@ -146,18 +264,37 @@ string run(){
 
             //NEED CHECK WORD TO ANSWER // CHECK CORRECTNESS - use helper function
             checkguess(guess, attempts);
+
+            // cout << "pushing into guesses" << endl;
             guesses.push_back(guess);
+
+            // cout << "THIS IS invalidlist: ";
+            // for (auto &i : invalidlist){
+            //     cout << thelist[i].word << " ";
+            // }
+            // cout << endl << endl;
+
+            // cout << "THIS IS totinvalid: ";
+            // for (auto &i : totinvalid){
+            //     cout << '(' << i.first << ", " << i.second << ')';
+            // }
+            // cout << endl << endl;
 
             attempts++;
         }catch (runtime_error &e){
             cerr << e.what() << endl;
         }
 
+        // cout << "MADE IT TO SHOWGUESSES" << endl;
         showguesses(guesses);
 
         cout << "YOUR ATTEMPTS: " << attempts << endl << endl;
     }//END while loop
 
-    if (attempts == 7) return "you lost, lol";
-    return "IN WORKS: finished run";
-}//END run()
+    if (guessbool != "22222" && attempts == 6){
+        cout << "lol u failed" << endl;
+    }
+
+    cout << "THIS IS RUN\n";
+
+}//END run
