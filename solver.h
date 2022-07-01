@@ -1,5 +1,5 @@
 #include "solver.hpp"
-#include <unordered_map>
+
 
 using namespace std;
 
@@ -49,9 +49,14 @@ void thelistmaker(){
             master[tempword[i]][i].insert(counter);
 
             freqatpos[tempword[i]][i]++;
+            frequencies[tempword[i]]++;
         }counter++;
     }
     firstsuggestions();
+
+    // for (auto &c : alphabet){
+    //     cout << c << ": " << frequencies[c] << endl;
+    // }
 }//END listmaker
 
 unordered_set<int> intersections(const list<unordered_set<int>> &ilist){
@@ -159,9 +164,12 @@ void checkguess(Word &word, int attempts){
                 // cout << "INSERT INTO INVALIDLIST: " << thelist[u].word << endl;
                 invalidlist.insert(u);
             }
-            if (validchar.find(word.word[i]) != validchar.end() || attempts == 0){
+            if (validchar.find(word.word[i]) == validchar.end()){
                 // cout << "INSERT INTO INVALIDCHAR: " << word.word[i] << endl;
-                invalidchar.insert(word.word[i]);
+                if (word.word.substr(i+1).find(word.word[i]) == string::npos){
+                    // cout << "adding into invalid char" << endl;
+                    invalidchar.insert(word.word[i]);
+                }
             }
         }
 
@@ -213,19 +221,19 @@ void checkguess(Word &word, int attempts){
         if (yellowset.size() != 0){
             // cout << "YELLOWSET SIZE is not 0: " << yellowset.size() << endl;
             thefinal = intersections({resultant, yellowset});
-            // cout << "THIS IS FINAL INTERSECTIONS: ";
-            // for (auto &f : thefinal){
-            //     cout << thelist[f].word << ' ';
-            // }cout << endl;
-            onlyvalids(thefinal, invalidlist);
-            suggest(thefinal, deleted, thelist);
+            resultant = thefinal;
         }
 
-        else { //yellowset size is 0
-            // cout << "yellowset is 0" << endl;
-            onlyvalids(resultant, invalidlist);
-            suggest(resultant, deleted, thelist);
-        }
+
+        
+        onlyvalids(resultant, invalidlist);
+        suggest(resultant, deleted, thelist, frequencies);
+
+
+
+        // for (auto &s : scores){
+        //     cout << s.first << ": " << s.second << endl;
+        // }
 
         
 
@@ -236,10 +244,10 @@ void checkguess(Word &word, int attempts){
         //use the frequenct list to compute the next best suggestion based on 5 invalids.
         cout << "you got nothing remotely close in the first try" << endl;
     }
-
+    // cout << "end of checkguess" << endl;
 }//END checkguess
 
-string run(){
+void run(){
     // test();
 
     uint32_t attempts = 0;
@@ -256,6 +264,8 @@ string run(){
 
             //NEED CHECK WORD TO ANSWER // CHECK CORRECTNESS - use helper function
             checkguess(guess, attempts);
+
+            // cout << "pushing into guesses" << endl;
             guesses.push_back(guess);
 
             // cout << "THIS IS invalidlist: ";
@@ -275,11 +285,16 @@ string run(){
             cerr << e.what() << endl;
         }
 
+        // cout << "MADE IT TO SHOWGUESSES" << endl;
         showguesses(guesses);
 
         cout << "YOUR ATTEMPTS: " << attempts << endl << endl;
     }//END while loop
 
-    return "THIS IS RUN\n";
+    if (guessbool != "22222" && attempts == 6){
+        cout << "lol u failed" << endl;
+    }
+
+    cout << "THIS IS RUN\n";
 
 }//END run

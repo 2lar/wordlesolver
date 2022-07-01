@@ -6,7 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
-
+#include <unordered_map>
 #include <unordered_set>
 #include <list>
 
@@ -39,9 +39,24 @@ struct Word{
 
 
 //beautify with these functions;
-void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word> &thelist){
+void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word> &thelist, unordered_map<char, int> &frequencies){
     // cout << "THIS IS IN SUGGEST FUNCTION" << endl;
-    cout << "THIS IS RESULTANT: ";
+
+    map<string, int> scores;
+    pair<string, int> highscore = {"", 0};
+    for (auto &i : resultant){
+        int ascore = 0;
+        for (char &c : thelist[i].word){
+            ascore += frequencies[c];
+        }
+        scores[thelist[i].word] = ascore;
+        if (ascore > highscore.second){
+            highscore.first = thelist[i].word;
+            highscore.second = ascore;
+        }
+    }
+        
+    cout << "\nYour list of candidate answers: ";
     for (auto &i : resultant){
         cout << thelist[i].word << ' ';
     }cout << endl;
@@ -51,27 +66,38 @@ void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word
     //     cout << s << endl;
     // }cout << endl;
 
-    cout << "THIS IS ONE SUGGESTION: ";
+    cout << "\nTHIS IS ONE SUGGESTION (first in list): ";
 
     for (int r : resultant){
         bool brek = false;
         if (deleted.empty()) break;
         //iterates over the deleted ones so that they don't print as a suggestion
         vector<string>::iterator w = find(deleted.begin(), deleted.end(), thelist[r].word);
-        if (w != deleted.end()){
-            cout << "DELETED: " << *w << endl;
-            resultant.erase(r);
-        }
+        // if (w != deleted.end()){
+        //     cout << "DELETED: " << *w << endl;
+        //     resultant.erase(r);
+        // }
     }
 
     for (int r : resultant){
         cout << thelist[r].word;
         break;
     }cout << endl;
+
+    cout << "SUGGESTION WITH HIGHEST SCORE: " << highscore.first << endl;
+
+    //this is for random pick
+    vector<int> therand;
+    therand.insert(therand.end(), resultant.begin(), resultant.end());
+
+    int random = rand() % therand.size();
+    cout << "THIS IS RANDOM SUGGESTION: " << thelist[therand[random]].word << endl;
+
+
 }
 
 void showguesses(vector<Word> &guesses){
-    cout << "YOUR GUESSES:\n------------\n";
+    cout << "\nYOUR GUESSES:\n------------\n";
     for (Word &w : guesses){
         for (char &c : w.word){
             cout << c << ' ';
