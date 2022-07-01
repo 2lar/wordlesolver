@@ -26,7 +26,6 @@ struct Word{
 
     Word(string x = "     "){
         if (x.size() != 5){
-            // cerr << "Invalid word size: "+x+"\n"; //user defined literal operator to iterate through each char
             throw runtime_error("==== Invalid word size: "+x+" ====\n");
         }
         for (char &c : x){
@@ -36,12 +35,8 @@ struct Word{
     }
 };//END word struct
 
-
-
 //beautify with these functions;
 void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word> &thelist, unordered_map<char, int> &frequencies){
-    // cout << "THIS IS IN SUGGEST FUNCTION" << endl;
-
     map<string, int> scores;
     pair<string, int> highscore = {"", 0};
     for (auto &i : resultant){
@@ -61,11 +56,6 @@ void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word
         cout << thelist[i].word << ' ';
     }cout << endl;
 
-    // cout << "IN DELETED" << endl;
-    // for (string &s : deleted){
-    //     cout << s << endl;
-    // }cout << endl;
-
     cout << "\nTHIS IS ONE SUGGESTION (first in list): ";
 
     for (int r : resultant){
@@ -73,10 +63,6 @@ void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word
         if (deleted.empty()) break;
         //iterates over the deleted ones so that they don't print as a suggestion
         vector<string>::iterator w = find(deleted.begin(), deleted.end(), thelist[r].word);
-        // if (w != deleted.end()){
-        //     cout << "DELETED: " << *w << endl;
-        //     resultant.erase(r);
-        // }
     }
 
     for (int r : resultant){
@@ -92,8 +78,6 @@ void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word
 
     int random = rand() % therand.size();
     cout << "THIS IS RANDOM SUGGESTION: " << thelist[therand[random]].word << endl;
-
-
 }
 
 void showguesses(vector<Word> &guesses){
