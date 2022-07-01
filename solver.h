@@ -50,13 +50,12 @@ void thelistmaker(){
         }counter++;
     }
     firstsuggestions();
-
 }//END listmaker
 
 unordered_set<int> intersections(const list<unordered_set<int>> &ilist){
     unordered_map<int, int> checker;
     unordered_set<int> ireturn;
-    const int isize = ilist.size();
+    const int isize = valid.size();
 
     for (const auto &sections : ilist){
         for (const auto &wordidx : sections){
@@ -149,15 +148,13 @@ void checkguess(Word &word, int attempts){
     //post finding intersections
     if (initial.size() < 5){
         resultant = intersections(tointersect);
-        
         if (yellowset.size() != 0){
             thefinal = intersections({resultant, yellowset});
             resultant = thefinal;
         }
-
+        
         onlyvalids(resultant, invalidlist);
         suggest(resultant, deleted, thelist, frequencies);
-      
     }
     else{
         //use the frequenct list to compute the next best suggestion based on 5 invalids.
@@ -183,7 +180,6 @@ void run(){
             checkguess(guess, attempts);
 
             guesses.push_back(guess);
-
             attempts++;
         }catch (runtime_error &e){
             cerr << e.what() << endl;
@@ -199,5 +195,4 @@ void run(){
     }
 
     cout << "THIS IS RUN\n";
-
 }//END run

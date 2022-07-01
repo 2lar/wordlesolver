@@ -64,7 +64,7 @@ void suggest(unordered_set<int> &resultant, vector<string> &deleted, vector<Word
         if (deleted.empty()) break;
         //iterates over the deleted ones so that they don't print as a suggestion
         vector<string>::iterator w = find(deleted.begin(), deleted.end(), thelist[r].word);
-   }
+    }
 
     for (int r : resultant){
         cout << thelist[r].word;
